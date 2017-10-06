@@ -2,13 +2,14 @@
 echo "start:";
 
 // procedural style
-$mysqli = mysqli_connect(
-    getenv('OPENSHIFT_MYSQL_DB_HOST'), 
+$mysqli = mysqli_connect("mysql://mysql:3306/","user5FT","EA2pDmbVOksIvxID","sampledb",3306);
+/*    getenv('OPENSHIFT_MYSQL_DB_HOST'), 
     getenv('OPENSHIFT_MYSQL_DB_USERNAME'), 
     getenv('OPENSHIFT_MYSQL_DB_HOST'), 
     getenv('OPENSHIFT_MYSQL_DB_PASSWORD'),
     getenv('OPENSHIFT_MYSQL_DB_PORT')
 );
+*/
 
 var_dump($mysqli);
 
