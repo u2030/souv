@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Down MyTube</title>
+</head>
+<body>
+<table width="90%">
+<tr>
+	<td>
+		<label>Url Youtube/Page:</label><input style="width: 300px;" id="engvidUrl" name="engvidUrl" type="text"/>
+		<button id="engvidSendBut" type="button">Find Video</button>
+	</td>
+	<td>
+		<label>Session ID:</label><input id="session" name="session" type="text"/><br/>
+		<label>Upload Url:</label><input id="upurl" name="upurl" type="text"/><br/>
+		<label>Video Url:</label><input id="videoUrl" name="videoUrl" type="text" style="width: 200px;"/><br/>
+		<input type="checkbox" id="uploadcheck" name="uploadcheck" checked ><label>Upload_Direct/Url_Upload</label>
+		<button id="videoBut" type="button">Download</button>
+	</td>
+</tr>
+<tr>
+	<td><div id="engvidResponseDiv"></div></td>
+	<td><div id="vidResponseDiv"></div></td>
+</tr>
+</table>
+
+<script>
+
+  var httpRequest0;
+  var httpRequest;
+  document.getElementById("engvidSendBut").addEventListener('click', makeRequest0);
+  document.getElementById("videoBut").addEventListener('click', makeRequest);
+  
+  function makeRequest0() {
+	document.getElementById("engvidResponseDiv").innerHTML = "";
+	document.getElementById("vidResponseDiv").innerHTML = "";
+	document.getElementById("videoUrl").value = "";
+	
+    httpRequest0 = new XMLHttpRequest();
+
+    if (!httpRequest0) {
+      alert('Giving up :( Cannot create an XMLHTTP instance');
+      return false;
+    }
+    httpRequest0.onreadystatechange = alertContents0;
+    httpRequest0.open('POST', 'downloadenvid.php');
+	httpRequest0.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    httpRequest0.send('url=' + encodeURIComponent(document.getElementById("engvidUrl").value));
+  }
+  
+  function startDownload(url){
+   document.getElementById("videoUrl").value = url; 
+   makeRequest();
+  }
+  
+  function alertContents0() {
+	document.getElementById("engvidResponseDiv").innerHTML = httpRequest0.responseText;
+    if (httpRequest0.readyState === XMLHttpRequest.DONE) {
+      if (httpRequest0.status === 200) {
+        document.getElementById("engvidResponseDiv").innerHTML = httpRequest0.responseText;
+		var links = document.querySelectorAll("#engvidResponseDiv td");
+		for(var i=2; i< links.length; i+=4){
+			links[i].innerHTML += "<button onclick=\"startDownload('"+ links[i+1].children[0].href + "')\">Up>></button>";
+		}
+      } else {
+		console.log(httpRequest0);
+        alert('There was a problem with the request.');
+      }
+    }
+  }
+
+  function makeRequest() {
+	document.getElementById("vidResponseDiv").innerHTML = "";
+	
+    httpRequest = new XMLHttpRequest();
+
+    if (!httpRequest) {
+      alert('Giving up :( Cannot create an XMLHTTP instance');
+      return false;
+    }
+    httpRequest.onreadystatechange = alertContents;
+    httpRequest.open('POST', 'downloadgooglevid.php');
+    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	
+	var postData = 'url=' + encodeURIComponent(document.getElementById("videoUrl").value);
+	var filename = document.getElementById("youtubetitle").value;
+	filename = filename.replace(/["]/g, "'");
+	filename = filename.replace(/[&]/g, "and");
+	filename = filename.replace(/[\\|:"*<>/?]/g, "");
+	postData += "&name=" + filename;
+
+	if(document.getElementById("upurl").value != null && document.getElementById("upurl").value != "")
+		postData += "&upurl=" + document.getElementById("upurl").value;
+		
+	if(document.getElementById("session").value != null && document.getElementById("session").value != "")
+		postData += "&session=" + document.getElementById("session").value;
+	var uploadCheck = document.getElementById("uploadcheck");
+	if(uploadCheck.checked) {
+		postData += "&upload=true";
+	}
+	
+    httpRequest.send(postData);
+  }
+  function alertContents() {
+	document.getElementById("vidResponseDiv").innerHTML = httpRequest.responseText;
+    if (httpRequest.readyState === XMLHttpRequest.DONE) {
+      if (httpRequest.status === 200) {
+        document.getElementById("vidResponseDiv").innerHTML += "done";//httpRequest.responseText;
+      } else {
+		console.log(httpRequest);
+        alert('There was a problem with the request.');
+      }
+    }
+  }
+
+</script>
+</body>
+</html>
